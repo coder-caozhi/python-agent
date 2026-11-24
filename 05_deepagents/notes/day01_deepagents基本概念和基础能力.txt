@@ -1,0 +1,333 @@
+
+
+1. 智能体发展历程
+   发展过程:
+      时代1: 非智能体,就是传统的项目,调用了大模型的接口,实现了部分的功能!
+      时代2: langchain open ai 可以创建agent的智能体,智能体有模型,有工具,有记忆,可以规划! 实现问题的自主拆解
+            问题: 单智能体,共用一个模型一套上下文系统,多场景任务出现记忆混乱! 模型的注意力集中机制下降!!
+      时代3: 深度代理多智能体的概念, deepagents,创建一个智能体的集群,有负责具体任务的子智能体,每个子智能体可以配置单独的模型以及独立
+            上下文系统,互相隔离不干扰! 同时必备一个主智能体,主智能体不负责具体的业务,负责调用和规划!!
+            问题: 消耗token问题 , 乌漆嘛黑(黑盒)
+   实现多智体的必备技术栈:
+      深度代理技术(deepagents): 可以创建智能体集群! deepagents
+      高阶提示词: 多智能体,我们的提示词只做指导不做具体的说明!!
+2. deepagents框架的入门
+
+   2.1 langchain家族框架对比
+       langchain(framework): 负责模型交互等基础操作
+       langgraph(runtime)  : 负责low流程的控制! 流程固化,有少量的条件边!!
+       deepagents(harness) : 负责复杂任务,子代理的动态规划
+   2.2 使用规划
+       https://docs.langchain.com/oss/python/concepts/products?_gl=1*1yjjh1s*_gcl_au*NDY3NzQzODE4LjE3ODM2NDM1MDk.*_ga*MTQwNTA1NDkwMi4xNzg0MjcxOTE0*_ga_47WX3HKKY2*czE3ODUyODM3MjQkbzEkZzEkdDE3ODUyODM3MjkkajU1JGwwJGgw
+   2.3 入门案例
+       步骤1: 安装依赖 pip install deepagents tavily-python python-dotenv langchain-openai
+       步骤2: 初始化配置文件 .env , 加载配置文件 load_dotenv(override=True)
+       步骤3: 初始化模型 init-chat-model(model,model_provider -> 知名模型,base_url / api_key)
+       步骤4: 定义联网搜索工具
+             细节: 1. 装饰器中添加description描述 2.添加注释描述
+             tavily_client = TavilyClient(api_key=os...)
+             @tool
+             def xxx(query:str,max_results:int=10)
+                """xxx"""
+                return tavily_client.search(query,max_results)
+       步骤5: 创建deepagent
+             deep_agent = create_deep_agent(model,tools,system_prompt ="角色,能力,边际" )
+       步骤6: 执行和获取结果
+             result = deep_agent.invoke(input={'messages':[HumanMessage(content="xx") / {role:user,content:"内容"}]})
+             result => {"messages":[HumanMessage,ToolMessage...,AIMessage(content="最终结果")]}  [langgraph state(TypedDict)]
+             print(result['messages'][-1].content)
+   2.4 总结使用
+       1.执行函数选择
+          类别1: invoke / ainvoke : 不体现中间的过程,一次执行获取最终的结果
+          类别2: stream / astream : 体现中间的调用,每次独立返回结果! 最后一次,一定模型反馈的结果 [推荐]
+       2.参数传递
+          invoke / stream (input=输入的内容 {"messages:[Message HumanMessage / {role:"user",content:"输入的内容"}]"})
+       3.结果解析
+          invoke / ainvoke -> {"messages": [Message... AIMessage]}  -> result['messages'][-1].content
+            注意: invoke/ ainvoke也是可以体现调用过程 messages:[HumanMessage->模型交互 ,
+                                                          AIMessage(content="",tool_calls:[{name:xx,args:""}]),
+                                                          ToolMessage(content="工具的结果")
+                                                          ToolMessage(content="工具的结果")
+                                                          ToolMessage(content="工具的结果")
+                                                          ToolMessage(content="工具的结果")
+                                                          AIMessage(content="",tool_calls:[{name:xx,args:""}]),
+                                                          ToolMessage(content="工具的结果")
+                                                          AIMessage(content="有值",tool_calls:[])]
+          stream / astream执行: for chunk in stream:  {model} {tools:{messages:[]}} {} {}
+            场景1: 模型决定调用工具 {model: {messages:[AIMessages(content="",tool_calls=[{name:"工具名",args:{key:value}}...])]} }
+            场景2: 模型决定调用子智能体  {model: {messages:[AIMessages(content="",tool_calls=[{name:"task",args:{subagent_type:"",description:""}}...])]} }
+            场景3: 模型最终返回结果 {model: {messages:[AIMessages(content="有值",tool_calls=[])]} }
+            场景4: 调用工具返回结果 {tools: {messages:[ToolMessage(content="有值",name="不等于task")]}}
+            场景5: 调用子代理返回结果 {tools: {messages:[ToolMessage(content="有值",name="等于task")]}}
+
+            for node_name,state in chunk.items():
+                # 去掉无效的数据
+                if (not state) or ("messages" not in state): continue
+                message =  state['messages'][-1]
+                # 判断model
+                if node_name == "model":
+                    if message.content:
+                        # 调用模型,最终返回结果
+                        print(f"[模型]最终返回的结果:{message.content[:100]}....")
+                    else:
+                        # 模型决定调用工具或者调用子智能体
+                        tool_calls = message.tool_calls
+                        for tool_call in tool_calls:
+                            tool_name = tool_call['name']
+                            if tool_name == 'task':
+                                # 调用了子智能体
+                                print(f"[模型]决定本次调用{tool_call['args']['subagent_type']}子智能体,实现功能! ")
+                            else:
+                                # 调用具体的工具
+                                print(f"[模型]决定本次调用{tool_name}工具,实现功能!传入参数为:{tool_call['args']}")
+                elif node_name == "tools":
+                    # tool
+                    name = message.name
+                    if name == 'task':
+                        # 调用子智能体
+                        print(f"[子智能体]执行返回的结果{message.content[:100]}...!")
+                    else:
+                        # 调用具体的工具
+                        print(f"[工具]{name}执行返回的结果:{message.content[:100]}...!")
+
+3. deepagents子代理的配置
+   3.1 多智能概念和弊端
+       将复杂的任务拆分! 每个智能体专注单一领域的工作! 最终有主智能体进行综合协作! "分而治之"
+       多智能体: token的消耗 以及调试问题!!
+   3.2 使用多智能体的铁律
+       1. 问题必须'极度'开放   : 每次的问题会有非常不确定的流程! (确定流程或者简单的不确定->langgraph)
+       2. 存在领域性的冲突     : 智能体负责的内容不同领域! 例如: 金融/法律/技术测试..
+       3. 存在并行提高性能需求 :  任务可以并行处理,提高整体效率! ( (1.先帮我干啥 2.再帮我干啥 3.最后干啥.. ) -> 一套业务一个事务 )
+       4. 存在不同模型的需求   : 功能中,又要使用大语言模型,又要使用嵌入式模型,又要使用重排序模型又要使用视觉模型....
+   3.3 多智能的使用架构
+       层级工作流: 有一个主智能体(大脑),进行任务接收和拆解,分配调用对应子智能体,并且接收子智能体返回的结果!最终汇总输出
+       协作工作流: 去中心化,没有主智能体概念,问题共享,协作解决,容易出现问题讨论不完的场景!!
+   3.4 创建子代理
+          create_deep_agent(subagents=[x,x,x,x])
+
+          agent => 模型 工具  提示词 长短期记忆  => 智能体就是一个综合体 (模型 工具  提示词 长短期记忆)
+       方式1: 基于字典创建 dict = {}
+            固定的属性:
+                name          子代理的唯一标识,最好体现我们的功能点
+                description   子代理的功能的描述,给主代理 -> 主体代理的上下文
+                system_prompt 系统提示词,子代理和模型交互的时候提供! 角色/功能/边际(输出格式..)
+                tools         子代理的工具列表
+                model         子代理配置的模型,如果不配置,和主代理一致!
+            from langchain.chat_models import init_chat_model
+            from deepagents import create_deep_agent
+            import os
+            from dotenv import load_dotenv, find_dotenv
+            import json
+
+            load_dotenv(find_dotenv())
+
+            # 极简初始化（自动读取OPENAI环境变量）
+            llm = init_chat_model(
+                model=os.getenv("LLM_MODEL", "deepseek-chat"),
+                temperature=0.1,  # 自定义温度（更严谨的回答）
+                model_provider="openai"
+            )
+
+            # 1. 定义子智能体：天气助手
+            weather_agent = {
+                "name": "weather_helper",
+                "description": "用于查询天气信息的助手。",
+                "system_prompt": "你是一个天气助手。无论用户问哪个城市的天气，你都统一回答：'今日天气晴朗，气温 25 度，适合出游。'",
+                "tools": []  # 这里不需要额外工具，仅靠 prompt 回复
+            }
+
+            # 2. 定义子智能体：计算助手
+            math_agent = {
+                "name": "math_helper",
+                "description": "用于处理数学计算问题。",
+                "system_prompt": "你是一个严谨的数学助手。请帮助用户计算数学问题。",
+                "tools": []
+            }
+
+            # 3. 定义子智能体：翻译助手
+            translate_agent = {
+                "name": "translator",
+                "description": "用于中英互译任务。",
+                "system_prompt": "你是一个翻译助手。如果是中文请翻译成英文，如果是英文请翻译成中文。",
+                "tools": []
+            }
+
+            # 4. 创建主智能体，并注册子智能体
+            main_agent = create_deep_agent(
+                model=llm,
+                tools=[],  # 主智能体本身不带工具，依靠子智能体
+                subagents=[weather_agent, math_agent, translate_agent],
+                system_prompt="你是一个全能管家。你会根据用户的需求，调度不同的助手来解决问题。"
+            )
+
+
+            # 5. 可视化运行 (Stream)
+            # 使用 stream() 替代 invoke()，可以实时打印出智能体的“调度”过程，看到它如何分发任务
+            def test_stream(query):
+                print(f"\n>>> 提问: {query}")
+                # 遍历流式输出
+                for chunk in main_agent.stream({"messages": [{"role": "user", "content": query}]}):
+                    # chunk 是一个字典，键是节点名 (如 'model', 'tools')，值是该节点的状态更新
+                    for node_name, state in chunk.items():
+                        if not state or "messages" not in state: continue
+                        messages = state["messages"]
+                        if messages and isinstance(messages, list):
+                            last_msg = messages[-1]
+                            # 1. 模型节点 (model)：决定下一步行动
+                            if node_name == "model":
+                                # 如果有 tool_calls，说明模型决定调用工具或子智能体
+                                if last_msg.tool_calls:
+                                    for tool_call in last_msg.tool_calls:
+                                        if tool_call['name'] == 'task':
+                                            sub_agent = tool_call['args'].get('subagent_type')
+                                            print(f"[模型决策] 呼叫子智能体: {sub_agent}")
+                                        else:
+                                            print(f"[模型决策] 调用工具: {tool_call['name']},参数为：{tool_call['args']}")
+                                # 如果没有 tool_calls 且有 content，说明是最终回复
+                                elif last_msg.content:
+                                    print(f"[最终回复] {last_msg.content}")
+
+                            # 2. 工具节点 (tools)：显示工具/子智能体的执行结果
+                            elif node_name == "tools":
+                                content_preview = ''
+                                if len(last_msg.content) > 100:
+                                    # 取前100个字符 + 省略号（截断预览）
+                                    content_preview = last_msg.content[:100] + "..."
+                                else:
+                                    # 内容较短，直接完整显示
+                                    content_preview = last_msg.content
+                                print(f"[执行结果] {content_preview}")
+            test_stream("北京今天天气怎么样？")
+            test_stream("100 + 256 等于多少？")
+       方式2: 基于CompiledSubAgent类型
+          存在的意义: 整合原有langgraph编译的图对象和langchain create_agent == dict
+          场景: 主 -> 3个子智能体  其中一个子智能体内部流程是固定 1 2 3 (langgraph) [稍微有点意义!!]
+          deepagents -> langchain家族框架 -> langchain / langgraph
+
+          deepagents多智能体 -> 融合其他的智能体或者工作流
+            1. CompiledSubAgent 代码的融合,耦合性强到爆炸  langgraph -> state -> {messages:[list,add_message]}  [很鸡肋]
+            2. api/sdk的形式融合  api -> 调用接口  sdk -> 调用工具函数
+                             数据库dict子智能体
+               深度搜索       联网搜索dict子智能体
+                          rag系统(公司的内部文档)[ragflow] [api/sdk]
+                          我们  -> http -> fastapi = 接口 = rag  [api]
+                          我们  -> 工具类函数 -> 工具类(函数->http) -> fastapi = 接口 = rag  [sdk]
+
+         案例1: 融合langchain create_agent
+              #4. 将langchain的使用compiledSubagent包裹和编译即可
+              langchain_subagent = CompiledSubAgent(
+                    name="langchain_subagent",
+                    description="负责进行算数运算的子智能体,如有运算需求使用此智能体!",
+                    runnable=langchain_agent
+                )
+         案例2: 融合langgraph compile()
+              前提1: 图对象必须 compile() -> runnable = 编译后
+              前提2: 图的state必须包含 messages : list , add_message
+
+              1. 定义带有messages的状态 / 累加模型
+
+                 @dataclass
+                 class Xxx(TypeDict/BaseModel)
+
+                     BaseModel -> 接口 -> fastapi -> 1. 类型限制 2. json转化能力 dump..  @app.post() json  return 对象 - json
+                     TypeDict  -> 类   -> 字典  -> langgraph的需求 -> 节点 -> return { xx:xx }
+                     @dataclass -> __init__  类似 java @data ... -> 常规的一个配置类
+
+                 class SubState(TypedDict):
+                     messages: list,add_messages
+              2. 定义节点
+                   def 函数(state)
+                     1. 获取参数 state ['messages'] -> Message列表 -> 提供的参数
+                     2. 编写业务
+                     3. 返回结果
+                     return {
+                        messages:[
+                           AIMessage(content="")
+                        ]
+                     }
+              3. 定义和编译图对象
+                 graph =  graph_build.compile()
+              4. 添加到包装类型
+                 CompiledSubAgent(
+                   name / description
+                   runnable = graph
+                 )
+
+4. 简单总结
+   1. agent发展历程(周期1直接交互 周期2agent 周期3harness  / 深度代理+高阶提示词)
+   2. langchain家族三个窗口 (langchain(framework) / langgraph(runtime) / deepagents(harness) )
+   3. deepagents的入门案例 ( tavily使用 deepagents使用步骤  create_deep_agent(model/system_prompt/tools))
+   4. 详细讲解 执行函数(a invoke/ a stream) 参数传递 (input={"messages:[]} -> state)
+             结果解析  invoke result['messages'][-1].content  stream -> 123->model 45-> tool [重点]
+   5. 创建子代理 (1.多智能体 分而治之 2. 四问 问题极度开发 多场景兼容 并发需求 多模型类型需求 3. dict  CompiledSubAgent) [重点]
+   6. dict方式创建子智能体 (三个助手的案例)  dict{name,description,system_prompt,tools} [重点]
+   7. CompiledSubAgent兼容langchain/langgraph,不使用这种方式 耦合度太强/代码的融合 [重点]
+      langchain -> create_agent -> CompiledSubAgent(runnable=agent) [重点]
+      langgraph -> state messages list add_messages  /  节点 (state -> messages) return {messages:[AI]} / compile() / CompiledSubAgent(runnable=agent)
+
+5. hitl人机交互
+   思考: deep_agent -> 规划和调用任务 -> [删除文件 / 删除数据 / 发工资的工具 ] -> 人 -> 审批和复批 -> 执行..
+   5.1 概念和作用
+       人机交互,人参与到agent执行敏感工作的过程! 可以决定: 同意(approve) / 编辑(edit) / 拒绝(reject)
+       保护敏感数据安全性问题!!
+   5.2 最佳实践
+       步骤1: 开启人机交互配置
+          create_deep_agent(
+              model,
+              system_prompt,
+              tools,
+              subagents,
+              interrupt_on:{
+                 "工具名": True 开启 -> approve / edit / reject  /False(默认值),
+                 "工具名": {"allowed_decisions": ["approve", "reject"]},
+              }
+       步骤2: 配置短期记忆 checkpointer
+           create_deep_agent(
+              model,
+              system_prompt,
+              tools,
+              subagents,
+              interrupt_on:{
+                 "工具名": True 开启 -> approve / edit / reject  /False(默认值),
+                 "工具名": {"allowed_decisions": ["approve", "reject"]},
+              },
+              checkpointer=短期记忆对象 # 拦截后放行,二次执行的时候使用之前的上下文...  Command(resume...)
+           短期记忆: 同一个会话(thread_id)内可以共享上下文窗口!!!
+       步骤3: 必须配置同一个thread_id
+           invoke(input={messages:[]} , config={configurable:{thread_id:"007"}})
+           被拦截了...
+           invoke(Command(resume()) ,   config={configurable:{thread_id:"007"}})
+       步骤4: 配置拦截的决定
+           result = invoke(input={messages:[]} , config={configurable:{thread_id:"007"}})
+           被拦截了...
+           1. 有值 =  result.get("__interrupt__") -> 触发了拦截
+           2. 编写放行动作  decisions = [{"type":"approve"},{"type":"reject"}]
+           result = invoke(Command(resume={"decision":decisions}) ,   config={configurable:{thread_id:"007"}})
+   5.3 演示拒绝和同意
+       1. 定义三个工具
+       2. 正常定义deep_agent
+       3. 修改create_deep_agent(
+             interrupt_on = {"工具名":True}
+          )
+       4. 配置短期记忆  create_deep_agent(
+             interrupt_on = {"工具名":True},
+             checkpointer = new InMemorySaver()
+          )
+       5. 执行配置同一个线程id config = {"configurable":{"thread_id":"xx"}}
+       6. 检查是否被拦截了
+            result.get("__interrupt__") -> [Intrer..(value = {"action_requests":[{name:"",args:{参数名:xx}},{}] })]
+            interrupt_tool_list =   result.get("__interrupt__")[0].value['action_requests']
+            for tool in interrupt_tool_list:
+                检查是否被拦截 => [] -> {type:"reject" / "approve"}
+            二次执行:
+            result = invoke(Command(resume={decisions:[]}),config=)
+   5.4 演示编辑
+        编辑的数据格式
+         {
+            "type":"edit",
+            "edited_action":{
+               "name":"工具名",
+               "args":{参数....}
+            }
+         }
+   5.5 演示stream

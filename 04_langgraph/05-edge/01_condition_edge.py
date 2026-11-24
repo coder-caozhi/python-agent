@@ -1,0 +1,81 @@
+from typing import Literal
+from typing_extensions import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+
+# 1. 定义状态
+class GraphState(TypedDict):
+    value: int
+    step: str
+
+
+# 2. 定义节点函数
+def node_a(state: GraphState) -> dict:
+    """节点A：作为决策前的处理节点"""
+    print("执行节点A")
+    return {"value": state["value"], "step": "A执行完毕"}
+
+
+def node_b(state: GraphState) -> dict:
+    """节点B：处理偶数逻辑"""
+    print("执行节点B")
+    return {"value": state["value"] * 2, "step": "B执行完毕"}
+
+
+def node_c(state: GraphState) -> dict:
+    """节点C：处理奇数逻辑"""
+    print("执行节点C")
+    return {"value": state["value"] - 1, "step": "C执行完毕"}
+
+
+# 3 定义路由函数
+def route_func(state: GraphState) -> Literal["node_b_alias", "node_c_alias"]:
+    """路由函数：根据输入值判断执行哪个节点"""
+    if state["value"] % 2 == 0:
+        return "node_b_alias" # 偶数路由到node_b_alias
+    else:
+        return "node_c_alias" # 奇数路由到node_c_alias
+
+
+# 4. 构建图
+def build_graph():
+
+    # 创建图构建器
+    graph = StateGraph(GraphState)
+
+    # 添加节点
+    graph.add_node("node_a", node_a)
+    graph.add_node("node_b", node_b)
+    graph.add_node("node_c", node_c)
+
+    # 添加入口边
+    graph.add_edge(START, "node_a")
+    # 添加条件边
+    graph.add_conditional_edges(
+        "node_a",
+        route_func, {
+            "node_b_alias": "node_b",
+            "node_c_alias": "node_c"
+        }
+    )
+    # 添加结束边
+    graph.add_edge("node_b", END)
+    graph.add_edge("node_c", END)
+
+    # 编译图
+    return graph.compile()
+
+
+if __name__ == "__main__":
+
+    app = build_graph()
+
+    # 情况1：输入值为偶数
+    print("\n输入值为偶数 (2):")
+    result = app.invoke({"value": 2})
+    print(f"执行结果: {result}")
+
+    # 情况2：输入值为奇数
+    print("\n输入值为奇数 (1):")
+    result = app.invoke({"value": 1})
+    print(f"执行结果: {result}")
