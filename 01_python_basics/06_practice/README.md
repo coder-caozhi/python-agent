@@ -2,12 +2,29 @@
 
 | 练习 | 内容 |
 | --- | --- |
-| [打印验证](verify_print.py) | 用 `print` 输出变量 |
-| [Python 语法](python_syntax_practice.py) | 复习基础语法、生成器、闭包和异步 |
-| [学生成绩管理](student_basics.py) | 用类和列表实现录入、查询和平均分统计 |
-| [模块导入](module_import_demo.py) | 导入学生管理模块，读取模块名和常量 |
+| [打印验证](demo_print/verify_print.py) | 用 `print` 输出变量 |
+| [Python 语法](01_python_syntax_practice.py) | 复习基础语法、生成器、闭包和异步 |
+| [学生成绩管理](02_student_basics.py) | 用类和列表实现录入、查询和平均分统计 |
+| [图书馆借阅报表](03_library_syntax_practice.py) | 用馆藏导入、检索、统计、查库存和导出串起 Python 语法 |
+| [模块导入](demo_module_import/module_import_demo.py) | 导入学生管理模块，读取模块名和常量 |
 | [电商订单](python_ecommerce_order_practice.py) | 练习库存、优惠券、模拟支付和导出订单 |
 | [个人记账本](expense_tracker.py) | 用 SQLite 保存支出，练习命令行操作 |
+
+## 跟练图书馆借阅报表
+
+从仓库根目录运行。这个脚本使用 Python 3.10+ 标准库，内置样例数据。
+
+```powershell
+.\.venv\Scripts\python.exe .\01_python_basics\06_practice\03_library_syntax_practice.py
+```
+
+从 `main()` 开始看。`read_books()` 把每行文本拆成字段，用字典保存图书。接着按书名查找、统计借阅次数、查库存，最后把报表写到临时 JSON 文件并打印。临时文件会自动清理。
+
+默认样例有 4 本有效图书、18 次借阅，平均每本 4.5 次，热门图书占 50%。
+
+1. 把 `keyword` 改成 `"历史"`，观察查找失败时的提示。
+2. 把 `POPULAR_THRESHOLD` 从 `5` 改成 `6`，看看热门图书少了哪一本。
+3. 从 `SAMPLE_STOCK` 移除 `B02`，观察它怎样从“已借完”变成“待核对”。
 
 ## 个人记账本
 
@@ -58,10 +75,10 @@ cd D:\python\python-agent\01_python_basics\06_practice
 
 ## 更简单的基础练习：学生成绩管理
 
-先跟敲 `student_basics.py`：它只用变量、类型转换、函数、类、列表、条件、循环和基础异常处理，不需要安装依赖。程序退出后数据不会保存。
+先跟敲 `02_student_basics.py`：它只用变量、类型转换、函数、类、列表、条件、循环和基础异常处理，不需要安装依赖。程序退出后数据不会保存。
 
 ```powershell
-..\..\.venv\Scripts\python.exe student_basics.py
+..\..\.venv\Scripts\python.exe 02_student_basics.py
 ```
 
 运行后可以添加几个学生、查看列表、计算平均分并按姓名查找。试着输入字母或超出 0～100 的成绩，观察程序如何提示并重新输入。建议完成后自行增加“删除学生”功能。

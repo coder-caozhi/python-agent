@@ -72,9 +72,9 @@
 | `D:\python\python_grammar\day05-调试技巧\README.md` | `01_python_basics/05_debugging/README.md` |
 | `D:\python\python_grammar\day06-practice\.gitignore` | `01_python_basics/06_practice/.gitignore` |
 | `D:\python\python_grammar\day06-practice\expense_tracker.py` | `01_python_basics/06_practice/expense_tracker.py` |
-| `D:\python\python_grammar\day06-practice\python_syntax_practice.py` | `01_python_basics/06_practice/python_syntax_practice.py` |
+| `D:\python\python_grammar\day06-practice\python_syntax_practice.py` | `../../01_python_basics/06_practice/01_python_syntax_practice.py` |
 | `D:\python\python_grammar\day06-practice\README.md` | `01_python_basics/06_practice/README.md` |
-| `D:\python\python_grammar\day06-practice\student_basics.py` | `01_python_basics/06_practice/student_basics.py` |
+| `D:\python\python_grammar\day06-practice\student_basics.py` | `../../01_python_basics/06_practice/02_student_basics.py` |
 | `D:\python\PythonProject\1101_practice\python_ecommerce_order_practice.py` | `01_python_basics/07_comprehensive_practice/python_ecommerce_order_practice.py` |
 | `D:\python\PythonProject\1101_practice\python_syntax_practice.py` | `01_python_basics/07_comprehensive_practice/python_syntax_practice.py` |
 | `D:\python\PythonProject\1101_practice\student_basics.py` | `01_python_basics/07_comprehensive_practice/student_basics.py` |
