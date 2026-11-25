@@ -3,17 +3,18 @@
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from textwrap import dedent
 
 
 # 每行依次是编号、书名、借阅次数和类型。
-SAMPLE_RECORDS = """B01 | Python 入门 | 8 | 纸质
-B02 | 海边的故事 | 3 | 电子
-异常记录 | 缺少字段
-B03 | 星星从哪里来 | 5 | 纸质
-B04 | 数据整理笔记 | 2 | 纸质
-B05 | 演示无效次数 | -1 | 纸质
-B01 | 演示重复编号 | 1 | 纸质
-"""
+SAMPLE_RECORDS = dedent("""\
+    B01 | Python 入门 | 8 | 纸质
+    B02 | 海边的故事 | 3 | 电子异常记录 | 缺少字段
+    B03 | 星星从哪里来 | 5 | 纸质
+    B04 | 数据整理笔记 | 2 | 纸质
+    B05 | 演示无效次数 | -1 | 纸质
+    B01 | 演示重复编号 | 1 | 纸质
+""")
 SAMPLE_STOCK = {"B01": 3, "B02": 0, "B03": 1}
 POPULAR_THRESHOLD = 5
 

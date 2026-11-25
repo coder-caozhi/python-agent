@@ -5,10 +5,10 @@
 | [打印验证](demo_print/verify_print.py) | 用 `print` 输出变量 |
 | [Python 语法](01_python_syntax_practice.py) | 复习基础语法、生成器、闭包和异步 |
 | [学生成绩管理](02_student_basics.py) | 用类和列表实现录入、查询和平均分统计 |
+| [图书借还综合项目](03_library_project/README.md) | 分模块跟练馆藏导入、借还规则、报表和异步通知，附语法索引 |
 | [图书馆借阅报表](03_library_syntax_practice.py) | 用馆藏导入、检索、统计、查库存和导出串起 Python 语法 |
 | [模块导入](demo_module_import/module_import_demo.py) | 导入学生管理模块，读取模块名和常量 |
-| [电商订单](python_ecommerce_order_practice.py) | 练习库存、优惠券、模拟支付和导出订单 |
-| [个人记账本](expense_tracker.py) | 用 SQLite 保存支出，练习命令行操作 |
+| [已归档练习](04_archived_practice/) | 保留个人记账本、电商订单和旧版 Python 综合语法脚本 |
 
 ## 跟练图书馆借阅报表
 
@@ -26,40 +26,46 @@
 2. 把 `POPULAR_THRESHOLD` 从 `5` 改成 `6`，看看热门图书少了哪一本。
 3. 从 `SAMPLE_STOCK` 移除 `B02`，观察它怎样从“已借完”变成“待核对”。
 
-## 个人记账本
+## 已归档练习
+
+- [个人记账本](04_archived_practice/expense_tracker.py)
+- [电商订单](04_archived_practice/python_ecommerce_order_practice.py)
+- [旧版 Python 综合语法](04_archived_practice/python_syntax_practice.py)
+
+### 个人记账本
 
 这个项目用标准库实现，可以新增、查看、统计和删除支出，并将数据保存到 SQLite。目标是围绕一个真实的小业务，从头跟敲并理解常用 Python 写法；它是生产风格的教学示例，不是覆盖所有生产需求的财务系统。
 
-## 准备和运行
+#### 准备和运行
 
 需要 Python 3.10 或更高版本，无需安装第三方包。在 PowerShell 中进入本目录：
 
 ```powershell
-cd D:\python\python-agent\01_python_basics\06_practice
-..\..\.venv\Scripts\python.exe --version
-..\..\.venv\Scripts\python.exe expense_tracker.py --help
-..\..\.venv\Scripts\python.exe expense_tracker.py add --help
+cd D:\python\python-agent\01_python_basics\06_practice\04_archived_practice
+..\..\..\.venv\Scripts\python.exe --version
+..\..\..\.venv\Scripts\python.exe expense_tracker.py --help
+..\..\..\.venv\Scripts\python.exe expense_tracker.py add --help
 ```
 
-以上命令使用仓库中的虚拟环境。如果你已配置其他 Python 3.10+，也可以将 `..\..\.venv\Scripts\python.exe` 换成 `python` 或 `py -3`。默认数据库是本目录下 `data/expenses.db`，程序首次运行时自动创建；数据会保留，删除操作会实际删除记录。
+以上命令使用仓库中的虚拟环境。如果你已配置其他 Python 3.10+，也可以将 `..\..\..\.venv\Scripts\python.exe` 换成 `python` 或 `py -3`。默认数据库是归档目录下的 `data/expenses.db`，程序首次运行时自动创建。数据会保留，删除操作会实际删除记录。
 
 ```powershell
-..\..\.venv\Scripts\python.exe expense_tracker.py add 35.50 餐饮 --date 2026-11-01 --note 午餐
-..\..\.venv\Scripts\python.exe expense_tracker.py add 12.00 交通 --date 2026-11-02 --note 地铁
-..\..\.venv\Scripts\python.exe expense_tracker.py list
-..\..\.venv\Scripts\python.exe expense_tracker.py list --month 2026-11
-..\..\.venv\Scripts\python.exe expense_tracker.py summary --month 2026-11
-..\..\.venv\Scripts\python.exe expense_tracker.py --verbose delete 1
+..\..\..\.venv\Scripts\python.exe expense_tracker.py add 35.50 餐饮 --date 2026-11-01 --note 午餐
+..\..\..\.venv\Scripts\python.exe expense_tracker.py add 12.00 交通 --date 2026-11-02 --note 地铁
+..\..\..\.venv\Scripts\python.exe expense_tracker.py list
+..\..\..\.venv\Scripts\python.exe expense_tracker.py list --month 2026-11
+..\..\..\.venv\Scripts\python.exe expense_tracker.py summary --month 2026-11
+..\..\..\.venv\Scripts\python.exe expense_tracker.py --verbose delete 1
 ```
 
 `--db` 和 `--verbose` 是全局参数，需要放在 `add`、`list` 等子命令之前。可指定单独的数据库做练习，例如：
 
 ```powershell
-..\..\.venv\Scripts\python.exe expense_tracker.py --db practice.db add 9.90 饮料
-..\..\.venv\Scripts\python.exe expense_tracker.py --db practice.db list
+..\..\..\.venv\Scripts\python.exe expense_tracker.py --db practice.db add 9.90 饮料
+..\..\..\.venv\Scripts\python.exe expense_tracker.py --db practice.db list
 ```
 
-## 建议的跟敲顺序
+#### 建议的跟敲顺序
 
 1. 从导入、常量、异常类开始，跟敲金额和日期校验函数。留意类型注解、`try/except`、`raise ... from` 和 f-string。
 2. 跟敲 `Expense`，理解数据类、属性、类方法和实例对象。
