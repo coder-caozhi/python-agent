@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-  # 声明源文件编码，便于在文件中书写中文注释
 # Python 语法综合练习：从上到下亲手抄写、运行，并尝试修改每个例子。
 # 运行环境：Python 3.10+，因为本文件使用了 match-case 和联合类型注解。
+from docutils.parsers.rst.roles import set_implicit_options
 
 # ============================================================  # 分隔线：注释不会被 Python 执行
 # 1. 输出、变量与基本数据类型  # 井号后面的内容是单行注释
@@ -111,7 +112,7 @@ unique_numbers = {1, 2, 2, 3, 3}  # 使用花括号创建集合，重复元素�
 unique_numbers.add(4)  # add() 向集合中添加一个元素
 unique_numbers.update([5, 6])  # update() 可以批量添加元素
 print(unique_numbers)  # 集合不保证按插入顺序展示
-print({1, 2, 3} | {3, 4, 5})  # | 表示集合并集
+print({1, 2, 3} | {3, 4, 5})  # | 表示集合并集,会去重{1, 2, 3, 4, 5}
 print({1, 2, 3} & {2, 3, 4})  # & 表示集合交集
 print({1, 2, 3} - {2})  # - 表示集合差集
 person = {"name": "George", "age": 25, "city": "Shanghai"}  # 使用键值对创建字典
@@ -181,10 +182,17 @@ even_squares = [number ** 2 for number in range(10) if number % 2 == 0]  # 推�
 number_set = {number for number in [1, 1, 2, 3]}  # 集合推导式会自动去重
 number_dict = {number: number ** 2 for number in range(4)}  # 字典推导式生成键值对
 number_generator = (number ** 2 for number in range(3))  # 圆括号中的推导式创建生成器表达式
+# 元组：立即创建元组
+c = tuple(number ** 2 for number in range(3))
+print(c)
+# a = (1, 2, 3)              # 元组
+# b = (1,)                   # 单元素元组
+# c = (1)                    # int，不是元组
+# d = (x for x in range(3))  # 生成器
 print(squares, even_squares, number_set, number_dict)  # 输出推导式创建的容器
 print(list(number_generator))  # list() 消费生成器并将结果转换为列表
 
-lazy_numbers = (print("计算") or number for number in range(3))
+lazy_numbers = (print("计算") or number for number in range(3)) # print("计算") 会打印“计算”，但返回值是 None。None 在布尔判断中相当于 False。or 遇到左边为假值时，会返回右边的值。
 # 创建生成器时还没有执行里面的 print。
 next(lazy_numbers)  # 获取第一个值 0，此时才打印“计算”。
 
@@ -209,13 +217,13 @@ user_name, user_age = get_user_info()  # 使用解包语法接收多个返回值
 print(user_name, user_age)  # 输出解包后的变量
 multiply = lambda x, y: x * y  # lambda 定义只有一个表达式的匿名函数
 print(multiply(3, 4))  # 调用匿名函数
-print(list(map(lambda value: value * 2, [1, 2, 3])))  # map() 将函数应用到可迭代对象的每个元素
+print(list(map(lambda value: value * 2, [1, 2, 3])))  # map() 将函数应用到可迭代对象的每个元素,mpa filter 产生的都是迭代器
 print(list(filter(lambda value: value > 2, [1, 2, 3, 4])))  # filter() 根据函数返回值筛选元素
 
 # 在循环结束后调用这些函数，它们读到的都是最后一次的 offset（2）。
-adders = [lambda value: value + offset for offset in range(3)]
-for add in adders:
-    print(add(10))  # 每次都输出 12。
+adders = [lambda value: value + offset for offset in range(3)] # 三个函数都引用了同一个 offset 变量
+for fun in adders:
+    print(fun(10))  # 每次都输出 12。
 
 # ============================================================  # 分隔线：注释不会被执行
 # 11. 异常处理  # 避免程序因为可预期的错误直接中断
@@ -311,7 +319,6 @@ print(temperature.celsius)  # 输出更新后的温度
 # ============================================================  # 分隔线：帮助组织代码结构
 
 from dataclasses import dataclass  # 导入 dataclass 装饰器
-from enum import Enum  # 导入 Enum 基类，用于创建枚举类型
 
 @dataclass  # dataclass 会自动生成常用的数据类方法，例如 __init__ 和 __repr__
 class Product:  # 定义一个主要用于保存数据的类
@@ -321,6 +328,8 @@ class Product:  # 定义一个主要用于保存数据的类
 
 product = Product("键盘", 199.0)  # 创建 dataclass 实例时可以使用位置参数
 print(product)  # dataclass 自动提供易读的对象字符串表示
+
+from enum import Enum  # 导入 Enum 基类，用于创建枚举类型
 
 class OrderStatus(Enum):  # 继承 Enum 创建枚举类
     PENDING = "pending"  # 定义一个枚举成员
@@ -384,6 +393,10 @@ def find_product(product_id: int) -> str | None:  # -> str | None 表示返回�
 
 found_product = find_product(1)  # 调用带类型注解的函数
 print(found_product)  # 类型注解不会自动改变程序运行时的行为
+
+container: tuple[int, str] = (1, "qwe") # 类型注解[]方括号描述
+combin: tuple[int | str, ...] = ("123",)  # 阅读单个元素类型
+numbers: tuple[int, ...] = (1, 2, 3, 4, 5)
 
 # ============================================================  # 分隔线：注释不会被执行
 # 19. 异步函数 async 与 await  # 用于编写异步任务，例如网络请求和异步 I/O
