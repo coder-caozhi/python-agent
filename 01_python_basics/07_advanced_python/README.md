@@ -20,7 +20,7 @@
 PowerShell：
 
 ```powershell
-cd D:\python\python-agent\01_python_basics\08_advanced_python
+cd D:\python\python-agent\01_python_basics\07_advanced_python
 ..\..\.venv\Scripts\python.exe iterator_basics.py
 ..\..\.venv\Scripts\python.exe generator_pipeline.py
 ..\..\.venv\Scripts\python.exe packing_unpacking.py

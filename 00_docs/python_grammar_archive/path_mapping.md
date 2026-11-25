@@ -1,5 +1,7 @@
 # 整理前后路径对照
 
+下表记录原迁移时的路径。后续合并的练习现位于 [06_practice](../../01_python_basics/06_practice/README.md)。
+
 | 原路径 | 新路径（相对项目根目录） |
 | --- | --- |
 | `D:\python\python_grammar\day01-基本语法\01.变量.py` | `01_python_basics/01_syntax/01_变量.py` |

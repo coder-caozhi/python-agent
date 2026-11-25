@@ -3,6 +3,9 @@
 数据只保存在内存中，退出程序后不会保存。运行方法见 README.md。
 """
 
+PI = 3.14  # 供 module_import_demo.py 演示访问模块属性。
+
+
 # class 定义类：把一个学生的数据和相关功能放在一起。
 class Student:
     # __init__ 在创建对象时调用；self 表示当前对象。
@@ -49,18 +52,27 @@ def read_score():
         print("成绩必须在 0 到 100 之间，请重新输入。")
 
 
+# def add_student(students):
+#     name = input("请输入姓名：").strip()
+#     # 空字符串在条件判断中为假；not 表示取反。
+#     if not name:
+#         print("姓名不能为空。")
+#         return
+#
+#     score = read_score()
+#     # Student(...) 创建对象；列表的 append 方法把对象添加到末尾。
+#     student = Student(name, score)
+#     students.append(student)
+#     print("添加成功。")
 def add_student(students):
-    name = input("请输入姓名：").strip()
-    # 空字符串在条件判断中为假；not 表示取反。
+    name = input("pls input name: ").strip()
     if not name:
-        print("姓名不能为空。")
+        print("name can't be empty")
         return
-
     score = read_score()
-    # Student(...) 创建对象；列表的 append 方法把对象添加到末尾。
     student = Student(name, score)
     students.append(student)
-    print("添加成功。")
+    print("添加成功")
 
 
 def show_students(students):

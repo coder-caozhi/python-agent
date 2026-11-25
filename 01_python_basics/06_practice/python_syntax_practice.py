@@ -184,6 +184,10 @@ number_generator = (number ** 2 for number in range(3))  # 圆括号中的推导
 print(squares, even_squares, number_set, number_dict)  # 输出推导式创建的容器
 print(list(number_generator))  # list() 消费生成器并将结果转换为列表
 
+lazy_numbers = (print("计算") or number for number in range(3))
+# 创建生成器时还没有执行里面的 print。
+next(lazy_numbers)  # 获取第一个值 0，此时才打印“计算”。
+
 # ============================================================  # 分隔线：注释不会被执行
 # 10. 函数、参数与返回值  # 函数用于封装可重复使用的逻辑
 # ============================================================  # 分隔线：帮助组织代码结构
@@ -207,6 +211,11 @@ multiply = lambda x, y: x * y  # lambda 定义只有一个表达式的匿名函�
 print(multiply(3, 4))  # 调用匿名函数
 print(list(map(lambda value: value * 2, [1, 2, 3])))  # map() 将函数应用到可迭代对象的每个元素
 print(list(filter(lambda value: value > 2, [1, 2, 3, 4])))  # filter() 根据函数返回值筛选元素
+
+# 在循环结束后调用这些函数，它们读到的都是最后一次的 offset（2）。
+adders = [lambda value: value + offset for offset in range(3)]
+for add in adders:
+    print(add(10))  # 每次都输出 12。
 
 # ============================================================  # 分隔线：注释不会被执行
 # 11. 异常处理  # 避免程序因为可预期的错误直接中断

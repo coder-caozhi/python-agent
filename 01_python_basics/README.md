@@ -7,8 +7,8 @@
 | [03 面向对象与模块](03_oop_and_modules/) | 类、实例、继承、导入 |
 | [04 文件与异常](04_files_exceptions_and_advanced/) | 读写文件、处理异常、使用高级语法 |
 | [05 调试](05_debugging/README.md) | 断点、单步运行、检查变量 |
-| [06 实践](06_practice/README.md) 与 [07 综合练习](07_comprehensive_practice/) | 用学生管理和记账脚本回顾前面的知识 |
-| [08 高级 Python](08_advanced_python/README.md) | 迭代器、生成器、打包解包和异步 |
+| [06 综合练习](06_practice/README.md) | 用语法、学生管理、电商订单和记账练习回顾前面的知识 |
+| [07 高级 Python](07_advanced_python/README.md) | 迭代器、生成器、打包解包和异步 |
 
 从仓库根目录运行第一个练习。
 

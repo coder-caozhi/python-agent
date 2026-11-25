@@ -1,4 +1,15 @@
-﻿# Python 综合练习：个人记账本
+﻿# Python 综合练习
+
+| 练习 | 内容 |
+| --- | --- |
+| [打印验证](verify_print.py) | 用 `print` 输出变量 |
+| [Python 语法](python_syntax_practice.py) | 复习基础语法、生成器、闭包和异步 |
+| [学生成绩管理](student_basics.py) | 用类和列表实现录入、查询和平均分统计 |
+| [模块导入](module_import_demo.py) | 导入学生管理模块，读取模块名和常量 |
+| [电商订单](python_ecommerce_order_practice.py) | 练习库存、优惠券、模拟支付和导出订单 |
+| [个人记账本](expense_tracker.py) | 用 SQLite 保存支出，练习命令行操作 |
+
+## 个人记账本
 
 这个项目用标准库实现，可以新增、查看、统计和删除支出，并将数据保存到 SQLite。目标是围绕一个真实的小业务，从头跟敲并理解常用 Python 写法；它是生产风格的教学示例，不是覆盖所有生产需求的财务系统。
 
