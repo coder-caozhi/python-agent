@@ -395,6 +395,7 @@ found_product = find_product(1)  # 调用带类型注解的函数
 print(found_product)  # 类型注解不会自动改变程序运行时的行为
 
 container: tuple[int, str] = (1, "qwe") # 类型注解[]方括号描述
+single_container: tuple[int] = (1,)
 combin: tuple[int | str, ...] = ("123",)  # 阅读单个元素类型
 numbers: tuple[int, ...] = (1, 2, 3, 4, 5)
 
