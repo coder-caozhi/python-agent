@@ -9,4 +9,4 @@ __pycache__/
 !.env.example
 *.db-wal
 *.db-shm
-/03_langchain/13_langchain_v1_course/day03-code/assets/models/
+/03_langchain/day03-code/assets/models/
