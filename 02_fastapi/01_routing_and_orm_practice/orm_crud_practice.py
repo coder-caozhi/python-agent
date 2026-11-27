@@ -416,7 +416,7 @@ def read_data_by_sql():
         session.close()  # 关闭会话
 
 if __name__ == "__main__":
-    # insert_department_data()
+    insert_department_data()
     # insert_employee_data()
     # delete_employee_data()
     # delete_department_data()
@@ -432,4 +432,4 @@ if __name__ == "__main__":
     # read_data_left_join()
     # read_data_right_join()
     # read_data_full_join()
-    read_data_by_sql()
+    # read_data_by_sql()
