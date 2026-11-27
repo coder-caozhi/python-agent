@@ -1,11 +1,11 @@
-﻿# FastAPI + SQLAlchemy 学习项目
+# FastAPI + SQLAlchemy 学习项目
 
 根据课件第 3、4、5 章的部门和员工案例编写，涵盖路径和查询参数、请求体校验、依赖注入、ORM 会话、增删改查和一对多关系。默认连接本机 MySQL，数据库名为 `fastapi_db`。需要 Python 3.10 或以上。
 
 ## 启动（PowerShell）
 
 ```powershell
-cd D:\python\python-agent\02_fastapi\01_department_employee_crud
+cd D:\python\python-agent\02_fastapi\02_department_employee_crud
 Copy-Item .env.example .env
 ..\..\.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```

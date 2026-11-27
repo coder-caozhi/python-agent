@@ -3,23 +3,28 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from routers import user, item # 手动套入 其他文件夹的模块
 
-# 3.2.1 创建新的项目
+# 3.2.2 创建新的项目
 app = FastAPI(title="路由分发demo")
 
-app.include_router(user.router)
+# 挂载用户路由：所有 /users 开头的请求由 user.router 处理
+# app.include_router(user.router)
 
-app.include_router(item.router)
+# 注意：item.router 里已经定义了 GET /items/ 和 GET /items/{item_id}，
+# 放在这里会优先匹配并覆盖下面 main.py 中的同名练习路由，练习时先注释掉
+# app.include_router(item.router)
 
+# 根路径 GET 接口（注：{"hello world"} 在 Python 中是 set，FastAPI 会序列化为 JSON 数组）
 @app.get("/")
 async def root():
     return {"hello world"}
 
+# 带路径参数 {name} 的 GET 接口，URL 中的值会自动作为 str 传给形参 name
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
 # 3.3.1 声明路径参数
-# @app.get("/items/{item_id}")
+@app.get("/items/{item_id}")
 async def read_item_id(item_id: int):
     return {"item_id": type(item_id).__name__}
 
@@ -28,18 +33,19 @@ async def read_item_id(item_id: int):
 async def read_user_me():
     return {"user_id": "the current user"}
 
+# user_id = me 时，结果是👆的返回
 @app.get("/users/{user_id}")
 async def read_user(user_id: str):
-    return {"user_id": user_id}
+    return {"path_para": user_id}
 
 # 3.4.1 url带查询参数
 items_list = [{"item1": "Foo"}, {"item2":"Bar"},{"item3":"Baz"}] # 用于数据查询
-@app.get("/items/")
+# @app.get("/items/")
 async def read_item(start: int, limit: int):
     return items_list[start : start + limit]
 
 # 3.4.3 可选的查询参数
-# @app.get("/items/{item_id}")
+@app.get("/items/{item_id}")
 async def read_item_optional(item_id: int, q: str | None = None):
     return {"item_id": item_id, "q": q}
 

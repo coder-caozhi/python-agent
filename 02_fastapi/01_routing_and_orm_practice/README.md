@@ -1,10 +1,10 @@
-﻿# 路由、参数与 ORM 课堂练习
+# 路由、参数与 ORM 课堂练习
 
 本目录保留原 1102 练习：`main.py` 为路由与参数示例，`orm_crud_practice.py` 为数据库操作练习。原 `test_app.py` 来自部门员工 CRUD 版本，与当前路由未必匹配。运行数据库脚本会修改数据。
 
 启动：在本目录执行 `..\..\.venv\Scripts\python.exe -m uvicorn main:app --reload --port 8002`。
 
-以下是原课程说明，供回顾原始 CRUD 案例；完整案例见相邻 `01_department_employee_crud`。
+以下是原课程说明，供回顾原始 CRUD 案例；完整案例见相邻 `02_department_employee_crud`。
 
 # FastAPI + SQLAlchemy 学习项目
 
@@ -13,7 +13,7 @@
 ## 启动（PowerShell）
 
 ```powershell
-cd D:\python\python-agent\02_fastapi\01_department_employee_crud
+cd D:\python\python-agent\02_fastapi\02_department_employee_crud
 ..\..\.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
 
