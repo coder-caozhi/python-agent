@@ -6,7 +6,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 
 
 # 0. 加载.env
@@ -31,4 +31,5 @@ response = client.chat.completions.create(
 )
 
 # 3. 解析输出
+print(response)
 print(response.choices[0].message.content)
