@@ -18,6 +18,7 @@ llm = ChatOpenAI(model="deepseek-v4-flash")
 result = llm.invoke(prompt)
 
 # 4. 获取结果
+# 创建字符串输出解析器：把大模型返回的 AIMessage 对象提取成纯字符串（效果等价于 result.content，也方便后续用 | 串成链）
 parser = StrOutputParser()
 str_result = parser.invoke(result)
 
